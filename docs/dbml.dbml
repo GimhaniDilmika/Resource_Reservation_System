@@ -1,0 +1,57 @@
+// PrimeWave Resource Reservation System Database Schema
+// Paste this directly into https://dbdiagram.io to visualize and export ER diagram
+
+Table User {
+  id uuid [pk]
+  name varchar [not null]
+  email varchar [unique, not null]
+  passwordHash varchar [not null]
+  role Role [not null, default: 'USER']
+  createdAt timestamptz [not null, default: `now()`]
+}
+
+Table ResourceCategory {
+  id uuid [pk]
+  name varchar [unique, not null]
+}
+
+Table Resource {
+  id uuid [pk]
+  name varchar [not null]
+  categoryId uuid [ref: > ResourceCategory.id, not null]
+  location varchar [not null]
+  capacity int
+  description text
+  isActive boolean [not null, default: true]
+  createdAt timestamptz [not null, default: `now()`]
+  updatedAt timestamptz [not null]
+}
+
+Table Reservation {
+  id uuid [pk]
+  resourceId uuid [ref: > Resource.id, not null]
+  userId uuid [ref: > User.id, not null]
+  title varchar [not null]
+  notes text
+  startTime timestamptz [not null]
+  endTime timestamptz [not null]
+  status ReservationStatus [not null, default: 'CONFIRMED']
+  createdAt timestamptz [not null, default: `now()`]
+  updatedAt timestamptz [not null]
+  cancelledAt timestamptz
+
+  indexes {
+    (resourceId, startTime)
+    (userId, startTime)
+  }
+}
+
+Enum Role {
+  ADMIN
+  USER
+}
+
+Enum ReservationStatus {
+  CONFIRMED
+  CANCELLED
+}
