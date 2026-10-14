@@ -16,7 +16,6 @@ import {
   MapPin,
   Users,
   CheckCircle2,
-  XCircle,
   Sparkles,
   ShieldAlert,
 } from "lucide-react";
@@ -71,7 +70,6 @@ export default function DashboardPage() {
       ]);
 
       if (statsRes.status === 401) {
-        // Not logged in -> quick auto-seed or redirect
         window.location.href = "/login";
         return;
       }
@@ -108,23 +106,22 @@ export default function DashboardPage() {
   const activeTimelineResource = resources.find((r) => r.id === activeTimelineResourceId);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col">
       <Navbar onOpenBookingModal={() => handleOpenBooking()} />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         {/* Hero Section */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-900 via-slate-900/90 to-indigo-950/40 border border-slate-800/80 p-6 sm:p-8">
-          <div className="absolute top-0 right-0 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-white via-slate-50 to-cyan-50/40 border border-slate-200/90 p-6 sm:p-8 shadow-xs">
           <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-medium mb-3">
-                <Sparkles className="w-3.5 h-3.5" />
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-100/80 border border-cyan-200 text-cyan-800 text-xs font-semibold mb-3">
+                <Sparkles className="w-3.5 h-3.5 text-cyan-700" />
                 Intelligent Concurrency & Double-Booking Protection Active
               </div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
                 Resource Overview & Operations
               </h1>
-              <p className="text-sm text-slate-400 mt-1 max-w-2xl">
+              <p className="text-sm text-slate-600 mt-1 max-w-2xl leading-relaxed">
                 Reserve conference suites, engineering rigs, production gear, and vehicle fleets with instant conflict prevention backed by PostgreSQL exclusion constraints.
               </p>
             </div>
@@ -132,14 +129,14 @@ export default function DashboardPage() {
             <div className="flex items-center gap-3 shrink-0">
               <button
                 onClick={() => handleOpenBooking()}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white text-xs font-bold shadow-lg shadow-cyan-500/20 active:scale-95 transition-all"
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-bold shadow-sm active:scale-95 transition-all"
               >
                 <PlusCircle className="w-4 h-4" />
                 Book Resource
               </button>
               <Link
                 href="/resources"
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-colors"
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold border border-slate-200 shadow-xs transition-colors"
               >
                 Catalog
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -150,60 +147,60 @@ export default function DashboardPage() {
 
         {/* Quick Stats Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="glass-panel p-5 rounded-2xl border border-slate-800/80">
+          <div className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-xs">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-slate-400">Total Resources</span>
-              <div className="p-2 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+              <span className="text-xs font-semibold text-slate-500">Total Resources</span>
+              <div className="p-2 rounded-xl bg-cyan-50 text-cyan-700 border border-cyan-200/70">
                 <Layers className="w-4 h-4" />
               </div>
             </div>
             <div className="mt-3">
-              <span className="text-2xl font-black text-white">{stats?.totalResources ?? "—"}</span>
-              <span className="text-xs text-slate-400 ml-2 font-medium">
+              <span className="text-2xl font-black text-slate-900">{stats?.totalResources ?? "—"}</span>
+              <span className="text-xs text-slate-500 ml-2 font-medium">
                 ({stats?.activeResources ?? "—"} active)
               </span>
             </div>
           </div>
 
-          <div className="glass-panel p-5 rounded-2xl border border-slate-800/80">
+          <div className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-xs">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-slate-400">Bookings Today</span>
-              <div className="p-2 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+              <span className="text-xs font-semibold text-slate-500">Bookings Today</span>
+              <div className="p-2 rounded-xl bg-indigo-50 text-indigo-700 border border-indigo-200/70">
                 <Calendar className="w-4 h-4" />
               </div>
             </div>
             <div className="mt-3">
-              <span className="text-2xl font-black text-white">{stats?.bookingsToday ?? "—"}</span>
-              <span className="text-xs text-indigo-400 ml-2 font-medium">scheduled</span>
+              <span className="text-2xl font-black text-slate-900">{stats?.bookingsToday ?? "—"}</span>
+              <span className="text-xs text-indigo-600 ml-2 font-semibold">scheduled</span>
             </div>
           </div>
 
-          <div className="glass-panel p-5 rounded-2xl border border-slate-800/80">
+          <div className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-xs">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-slate-400">Utilization Rate</span>
-              <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              <span className="text-xs font-semibold text-slate-500">Utilization Rate</span>
+              <div className="p-2 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200/70">
                 <TrendingUp className="w-4 h-4" />
               </div>
             </div>
             <div className="mt-3">
-              <span className="text-2xl font-black text-white">{stats?.utilizationRate ?? 0}%</span>
-              <span className="text-xs text-emerald-400 ml-2 font-medium">daily capacity</span>
+              <span className="text-2xl font-black text-slate-900">{stats?.utilizationRate ?? 0}%</span>
+              <span className="text-xs text-emerald-700 ml-2 font-semibold">daily capacity</span>
             </div>
           </div>
 
-          <div className="glass-panel p-5 rounded-2xl border border-slate-800/80">
+          <div className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-xs">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-slate-400">Conflict Engine</span>
-              <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
+              <span className="text-xs font-semibold text-slate-500">Conflict Engine</span>
+              <div className="p-2 rounded-xl bg-amber-50 text-amber-700 border border-amber-200/70">
                 <ShieldAlert className="w-4 h-4" />
               </div>
             </div>
             <div className="mt-3">
-              <span className="text-sm font-bold text-emerald-400 flex items-center gap-1.5">
+              <span className="text-sm font-bold text-emerald-700 flex items-center gap-1.5">
                 <CheckCircle2 className="w-4 h-4" />
                 Postgres GIST
               </span>
-              <p className="text-[11px] text-slate-400 mt-0.5">Hardware & OS enforced</p>
+              <p className="text-[11px] text-slate-500 mt-0.5">Database constraint enforced</p>
             </div>
           </div>
         </div>
@@ -212,16 +209,14 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Availability Inspector (2 cols) */}
           <div className="lg:col-span-2 space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                  <Clock className="w-5 h-5 text-cyan-400" />
-                  Live Resource Availability & Free Slots
-                </h2>
-                <p className="text-xs text-slate-400">
-                  Select a facility or hardware resource to preview availability and click any green slot to book.
-                </p>
-              </div>
+            <div>
+              <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <Clock className="w-5 h-5 text-cyan-600" />
+                Live Resource Availability & Free Slots
+              </h2>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Select a facility or hardware resource to preview availability and click any green slot to book.
+              </p>
             </div>
 
             {/* Resource Selector pills */}
@@ -234,8 +229,8 @@ export default function DashboardPage() {
                     onClick={() => setActiveTimelineResourceId(res.id)}
                     className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
                       isSelected
-                        ? "bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/25 scale-105"
-                        : "bg-slate-900 border border-slate-800 text-slate-300 hover:bg-slate-800 hover:text-white"
+                        ? "bg-cyan-600 text-white shadow-xs font-bold"
+                        : "bg-white border border-slate-200 text-slate-700 hover:bg-slate-100"
                     }`}
                   >
                     {res.name}
@@ -259,28 +254,28 @@ export default function DashboardPage() {
           {/* Upcoming Reservations Feed (1 col) */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-indigo-400" />
+              <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <Calendar className="w-5 h-5 text-indigo-600" />
                 Upcoming Bookings
               </h2>
-              <Link href="/reservations" className="text-xs text-cyan-400 hover:underline">
+              <Link href="/reservations" className="text-xs text-cyan-700 font-semibold hover:underline">
                 View all
               </Link>
             </div>
 
             <div className="space-y-3">
               {loading ? (
-                <div className="p-6 text-center text-xs text-slate-400">Loading bookings...</div>
+                <div className="p-6 text-center text-xs text-slate-500">Loading bookings...</div>
               ) : stats?.upcomingBookings && stats.upcomingBookings.length > 0 ? (
                 stats.upcomingBookings.map((b) => (
                   <div
                     key={b.id}
-                    className="p-3.5 rounded-2xl bg-slate-900/80 border border-slate-800/80 hover:border-slate-700 transition-colors"
+                    className="p-3.5 rounded-2xl bg-white border border-slate-200/90 shadow-xs hover:border-slate-300 transition-colors"
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div>
-                        <h4 className="text-xs font-bold text-white line-clamp-1">{b.title}</h4>
-                        <span className="text-[11px] text-cyan-400 font-medium">
+                        <h4 className="text-xs font-bold text-slate-900 line-clamp-1">{b.title}</h4>
+                        <span className="text-[11px] text-cyan-700 font-semibold">
                           {b.resource.name}
                         </span>
                       </div>
@@ -289,9 +284,9 @@ export default function DashboardPage() {
                       </span>
                     </div>
 
-                    <div className="mt-2.5 pt-2 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
+                    <div className="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
                       <span>{b.user.name}</span>
-                      <span className="font-mono text-slate-300">
+                      <span className="font-mono text-slate-700 font-medium">
                         {format(new Date(b.startTime), "MMM d, HH:mm")} -{" "}
                         {format(new Date(b.endTime), "HH:mm")}
                       </span>
@@ -299,8 +294,8 @@ export default function DashboardPage() {
                   </div>
                 ))
               ) : (
-                <div className="p-8 rounded-2xl bg-slate-900/40 border border-slate-800/50 text-center">
-                  <p className="text-xs text-slate-400">No upcoming reservations.</p>
+                <div className="p-8 rounded-2xl bg-white border border-slate-200 text-center">
+                  <p className="text-xs text-slate-500">No upcoming reservations.</p>
                 </div>
               )}
             </div>
