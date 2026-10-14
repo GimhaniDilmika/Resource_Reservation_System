@@ -1,0 +1,359 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import Navbar, { UserSession } from "@/components/Navbar";
+import BookingModal from "@/components/BookingModal";
+import ResourceModal from "@/components/ResourceModal";
+import AvailabilityTimeline from "@/components/AvailabilityTimeline";
+import {
+  Layers,
+  Search,
+  Plus,
+  MapPin,
+  Users,
+  Calendar,
+  Edit2,
+  PowerOff,
+  CheckCircle,
+  AlertCircle,
+  Clock,
+  Sparkles,
+} from "lucide-react";
+
+interface Resource {
+  id: string;
+  name: string;
+  categoryId: string;
+  location: string;
+  capacity: number | null;
+  description: string | null;
+  isActive: boolean;
+  category: { id: string; name: string };
+  _count?: { reservations: number };
+}
+
+interface Category {
+  id: string;
+  name: string;
+}
+
+export default function ResourcesPage() {
+  const [resources, setResources] = useState<Resource[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
+  const [search, setSearch] = useState("");
+  const [showActiveOnly, setShowActiveOnly] = useState(false);
+  const [currentUser, setCurrentUser] = useState<UserSession | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  // Booking Modal
+  const [isBookingOpen, setIsBookingOpen] = useState(false);
+  const [bookingResourceId, setBookingResourceId] = useState<string | undefined>();
+  const [bookingDate, setBookingDate] = useState<string | undefined>();
+  const [bookingStart, setBookingStart] = useState<string | undefined>();
+  const [bookingEnd, setBookingEnd] = useState<string | undefined>();
+
+  // Admin Resource Modal (Create / Edit)
+  const [isResourceModalOpen, setIsResourceModalOpen] = useState(false);
+  const [editingResource, setEditingResource] = useState<Resource | null>(null);
+
+  // Timeline expanded resource
+  const [expandedResourceId, setExpandedResourceId] = useState<string | null>(null);
+
+  async function loadData() {
+    setLoading(true);
+    try {
+      const [userRes, resourcesRes] = await Promise.all([
+        fetch("/api/auth/me"),
+        fetch(`/api/resources?${selectedCategory !== "ALL" ? `categoryId=${selectedCategory}&` : ""}${search ? `search=${encodeURIComponent(search)}&` : ""}${showActiveOnly ? "isActive=true" : ""}`),
+      ]);
+
+      const userData = await userRes.json();
+      const resData = await resourcesRes.json();
+
+      setCurrentUser(userData.user);
+      if (resData.resources) setResources(resData.resources);
+      if (resData.categories) setCategories(resData.categories);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    loadData();
+  }, [selectedCategory, search, showActiveOnly]);
+
+  function handleOpenBooking(resId: string, date?: string, start?: string, end?: string) {
+    setBookingResourceId(resId);
+    setBookingDate(date);
+    setBookingStart(start);
+    setBookingEnd(end);
+    setIsBookingOpen(true);
+  }
+
+  function handleCreateResource() {
+    setEditingResource(null);
+    setIsResourceModalOpen(true);
+  }
+
+  function handleEditResource(res: Resource) {
+    setEditingResource(res);
+    setIsResourceModalOpen(true);
+  }
+
+  async function handleToggleActive(res: Resource) {
+    const willDeactivate = res.isActive;
+    if (willDeactivate) {
+      const confirmed = window.confirm(
+        `Are you sure you want to deactivate "${res.name}"? If there are any upcoming confirmed bookings, you will be prompted to cancel them first.`
+      );
+      if (!confirmed) return;
+    }
+
+    try {
+      const resp = await fetch(`/api/resources/${res.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isActive: !res.isActive }),
+      });
+
+      const data = await resp.json();
+      if (!resp.ok) {
+        alert(data.error?.message || "Failed to update status");
+        return;
+      }
+      loadData();
+    } catch (err: any) {
+      alert(err.message || "An unexpected error occurred");
+    }
+  }
+
+  const isAdmin = currentUser?.role === "ADMIN";
+
+  return (
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
+      <Navbar onOpenBookingModal={() => handleOpenBooking(resources[0]?.id)} />
+
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+        {/* Page Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-medium mb-1.5">
+              <Layers className="w-3.5 h-3.5" />
+              Organizational Assets Catalog
+            </div>
+            <h1 className="text-2xl font-black text-white tracking-tight">Facility & Equipment Resources</h1>
+            <p className="text-xs text-slate-400">Search and reserve rooms, high-compute stations, and equipment with live availability.</p>
+          </div>
+
+          {isAdmin && (
+            <button
+              onClick={handleCreateResource}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white text-xs font-bold shadow-lg shadow-cyan-500/20 active:scale-95 transition-all shrink-0"
+            >
+              <Plus className="w-4 h-4" />
+              Add Resource
+            </button>
+          )}
+        </div>
+
+        {/* Filter & Search Bar */}
+        <div className="glass-panel p-4 rounded-2xl border border-slate-800 space-y-3">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+            {/* Search Input */}
+            <div className="relative flex-1">
+              <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search resources by name, location, or equipment specs..."
+                className="w-full pl-9 pr-4 py-2 rounded-xl bg-slate-900 border border-slate-700/80 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-500"
+              />
+            </div>
+
+            {/* Active Toggle */}
+            <label className="flex items-center gap-2 cursor-pointer text-xs text-slate-300 shrink-0">
+              <input
+                type="checkbox"
+                checked={showActiveOnly}
+                onChange={(e) => setShowActiveOnly(e.target.checked)}
+                className="w-4 h-4 rounded text-cyan-500 bg-slate-900 border-slate-700"
+              />
+              <span>Active only</span>
+            </label>
+          </div>
+
+          {/* Category Chips */}
+          <div className="flex flex-wrap gap-2 pt-1 border-t border-slate-800/80">
+            <button
+              onClick={() => setSelectedCategory("ALL")}
+              className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
+                selectedCategory === "ALL"
+                  ? "bg-cyan-500 text-slate-950 font-bold"
+                  : "bg-slate-900 text-slate-400 hover:text-white"
+              }`}
+            >
+              All Categories
+            </button>
+            {categories.map((c) => (
+              <button
+                key={c.id}
+                onClick={() => setSelectedCategory(c.id)}
+                className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
+                  selectedCategory === c.id
+                    ? "bg-cyan-500 text-slate-950 font-bold"
+                    : "bg-slate-900 text-slate-400 hover:text-white"
+                }`}
+              >
+                {c.name}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Resources Grid */}
+        {loading ? (
+          <div className="py-16 text-center text-xs text-slate-400">Loading resources catalog...</div>
+        ) : resources.length === 0 ? (
+          <div className="p-12 text-center glass-panel rounded-3xl border border-slate-800 space-y-3">
+            <Layers className="w-10 h-10 text-slate-600 mx-auto" />
+            <h3 className="text-sm font-semibold text-slate-300">No resources found</h3>
+            <p className="text-xs text-slate-500">Try adjusting your category or search query.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {resources.map((res) => {
+              const isExpanded = expandedResourceId === res.id;
+              return (
+                <div
+                  key={res.id}
+                  className={`glass-card p-5 rounded-3xl border flex flex-col justify-between space-y-4 ${
+                    res.isActive ? "border-slate-800/80" : "border-slate-800/50 opacity-75"
+                  }`}
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-start justify-between gap-2">
+                      <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-md bg-indigo-950/60 text-indigo-300 border border-indigo-800/50">
+                        {res.category.name}
+                      </span>
+                      <span
+                        className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                          res.isActive
+                            ? "bg-emerald-950/60 text-emerald-300 border border-emerald-800/50"
+                            : "bg-slate-800 text-slate-400 border border-slate-700"
+                        }`}
+                      >
+                        {res.isActive ? "Active" : "Inactive"}
+                      </span>
+                    </div>
+
+                    <div>
+                      <h3 className="text-base font-bold text-white leading-tight">{res.name}</h3>
+                      <p className="text-xs text-slate-400 mt-1 line-clamp-2 leading-relaxed">
+                        {res.description || "No specific instructions provided."}
+                      </p>
+                    </div>
+
+                    <div className="pt-2 flex flex-wrap items-center gap-3 text-xs text-slate-300">
+                      <div className="flex items-center gap-1.5 text-slate-400">
+                        <MapPin className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                        <span>{res.location}</span>
+                      </div>
+                      {res.capacity && (
+                        <div className="flex items-center gap-1.5 text-slate-400">
+                          <Users className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+                          <span>Cap: {res.capacity}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t border-slate-800/80 space-y-3">
+                    {/* Action buttons */}
+                    <div className="flex items-center justify-between gap-2">
+                      <button
+                        onClick={() => setExpandedResourceId(isExpanded ? null : res.id)}
+                        className="flex items-center gap-1.5 text-xs text-cyan-400 hover:text-cyan-300 font-semibold"
+                      >
+                        <Clock className="w-3.5 h-3.5" />
+                        {isExpanded ? "Hide Schedule" : "View Schedule"}
+                      </button>
+
+                      <div className="flex items-center gap-2">
+                        {isAdmin && (
+                          <>
+                            <button
+                              onClick={() => handleEditResource(res)}
+                              title="Edit Resource"
+                              className="p-1.5 rounded-lg bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 transition-colors"
+                            >
+                              <Edit2 className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              onClick={() => handleToggleActive(res)}
+                              title={res.isActive ? "Deactivate" : "Activate"}
+                              className={`p-1.5 rounded-lg transition-colors ${
+                                res.isActive
+                                  ? "bg-slate-800 text-slate-400 hover:text-amber-400 hover:bg-amber-950/40"
+                                  : "bg-emerald-950/50 text-emerald-400 hover:bg-emerald-900/60"
+                              }`}
+                            >
+                              <PowerOff className="w-3.5 h-3.5" />
+                            </button>
+                          </>
+                        )}
+
+                        <button
+                          onClick={() => handleOpenBooking(res.id)}
+                          disabled={!res.isActive}
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white text-xs font-bold shadow-md shadow-cyan-500/20 active:scale-95 disabled:opacity-40 transition-all"
+                        >
+                          <Calendar className="w-3.5 h-3.5" />
+                          Book
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Inline Collapsible Availability Timeline */}
+                    {isExpanded && (
+                      <div className="pt-2 animate-in fade-in duration-200">
+                        <AvailabilityTimeline
+                          resourceId={res.id}
+                          resourceName={res.name}
+                          onBookSlot={(date, start, end) => handleOpenBooking(res.id, date, start, end)}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </main>
+
+      {/* Booking Modal */}
+      <BookingModal
+        isOpen={isBookingOpen}
+        onClose={() => setIsBookingOpen(false)}
+        onSuccess={() => loadData()}
+        initialResourceId={bookingResourceId}
+        initialDate={bookingDate}
+        initialStartTime={bookingStart}
+        initialEndTime={bookingEnd}
+      />
+
+      {/* Admin Resource Modal */}
+      <ResourceModal
+        isOpen={isResourceModalOpen}
+        onClose={() => setIsResourceModalOpen(false)}
+        onSuccess={() => loadData()}
+        categories={categories}
+        editingResource={editingResource}
+      />
+    </div>
+  );
+}

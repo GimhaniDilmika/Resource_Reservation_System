@@ -69,12 +69,17 @@ export function handleApiError(err: unknown) {
   }
 
   if (err instanceof ZodError) {
+    const issues = (err as any).issues || (err as any).errors || [];
+    const formattedMessage = issues
+      .map((e: any) => `${(e.path || []).join(".")}: ${e.message}`)
+      .join(", ");
+
     return NextResponse.json(
       {
         error: {
           code: "VALIDATION_ERROR",
-          message: "Input validation failed: " + err.errors.map((e) => `${e.path.join(".")}: ${e.message}`).join(", "),
-          details: err.flatten(),
+          message: "Input validation failed: " + formattedMessage,
+          details: typeof err.flatten === "function" ? err.flatten() : issues,
         },
       },
       { status: 400 }
