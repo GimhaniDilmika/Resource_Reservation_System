@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { X, Calendar, Clock, AlertTriangle, CheckCircle, ArrowRight, Loader2 } from "lucide-react";
-import { format, addHours, addMinutes } from "date-fns";
+import { X, Calendar, AlertTriangle, CheckCircle, ArrowRight, Loader2 } from "lucide-react";
+import { format, addHours } from "date-fns";
 
 interface ResourceOption {
   id: string;
@@ -136,38 +136,38 @@ export default function BookingModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-6 sm:p-7 relative overflow-hidden">
-        {/* Glow accent */}
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-500 via-indigo-500 to-purple-600" />
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs animate-in fade-in duration-200">
+      <div className="w-full max-w-lg bg-white border border-slate-200 rounded-3xl shadow-2xl p-6 sm:p-7 relative overflow-hidden">
+        {/* Top accent line */}
+        <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-cyan-600 via-indigo-600 to-purple-600" />
 
-        <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+        <div className="flex items-center justify-between pb-4 border-b border-slate-100">
           <div>
-            <h2 className="text-xl font-bold text-white flex items-center gap-2">
-              <Calendar className="w-5 h-5 text-cyan-400" />
+            <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+              <Calendar className="w-5 h-5 text-cyan-600" />
               New Reservation
             </h2>
-            <p className="text-xs text-slate-400 mt-0.5">Book shared facility with automated conflict protection</p>
+            <p className="text-xs text-slate-500 mt-0.5">Book shared facility with automated conflict protection</p>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {errorMsg && (
-          <div className="my-4 p-3.5 rounded-xl bg-red-950/40 border border-red-800/60 text-red-200 text-xs">
+          <div className="my-4 p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs">
             <div className="flex items-start gap-2.5">
-              <AlertTriangle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+              <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
               <div className="space-y-2">
-                <p className="font-medium leading-relaxed">{errorMsg}</p>
+                <p className="font-semibold leading-relaxed">{errorMsg}</p>
                 {suggestedSlot && (
                   <button
                     type="button"
                     onClick={applySuggestedSlot}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-cyan-600 hover:bg-cyan-500 text-white font-semibold transition-colors"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-700 text-white font-semibold transition-colors shadow-xs"
                   >
                     <span>Use Suggested Slot ({format(new Date(suggestedSlot.start), "MMM d, HH:mm")} - {format(new Date(suggestedSlot.end), "HH:mm")})</span>
                     <ArrowRight className="w-3.5 h-3.5" />
@@ -181,12 +181,12 @@ export default function BookingModal({
         <form onSubmit={handleSubmit} className="space-y-4 mt-4">
           {/* Resource Selector */}
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5">Select Resource *</label>
+            <label className="block text-xs font-bold text-slate-700 mb-1.5">Select Resource *</label>
             <select
               value={resourceId}
               onChange={(e) => setResourceId(e.target.value)}
               required
-              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-800/80 border border-slate-700 text-slate-100 text-sm focus:outline-none focus:border-cyan-500 transition-colors"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-sm focus:outline-none focus:border-cyan-500 focus:bg-white transition-colors"
             >
               <option value="" disabled>Choose a resource...</option>
               {resources.map((r) => (
@@ -199,7 +199,7 @@ export default function BookingModal({
 
           {/* Title */}
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5">Reservation Title / Purpose *</label>
+            <label className="block text-xs font-bold text-slate-700 mb-1.5">Reservation Title / Purpose *</label>
             <input
               type="text"
               required
@@ -207,70 +207,70 @@ export default function BookingModal({
               placeholder="e.g. Sprint Architecture Review or Client Demo"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-800/80 border border-slate-700 text-slate-100 text-sm focus:outline-none focus:border-cyan-500 placeholder-slate-500 transition-colors"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-sm focus:outline-none focus:border-cyan-500 focus:bg-white placeholder-slate-400 transition-colors"
             />
           </div>
 
           {/* Date and Time slots */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">Date *</label>
+              <label className="block text-xs font-bold text-slate-700 mb-1.5">Date *</label>
               <input
                 type="date"
                 required
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl bg-slate-800/80 border border-slate-700 text-slate-100 text-xs focus:outline-none focus:border-cyan-500"
+                className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs focus:outline-none focus:border-cyan-500 focus:bg-white"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">Start Time *</label>
+              <label className="block text-xs font-bold text-slate-700 mb-1.5">Start Time *</label>
               <input
                 type="time"
                 required
                 value={startTime}
                 onChange={(e) => setStartTime(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl bg-slate-800/80 border border-slate-700 text-slate-100 text-xs focus:outline-none focus:border-cyan-500"
+                className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs focus:outline-none focus:border-cyan-500 focus:bg-white"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">End Time *</label>
+              <label className="block text-xs font-bold text-slate-700 mb-1.5">End Time *</label>
               <input
                 type="time"
                 required
                 value={endTime}
                 onChange={(e) => setEndTime(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl bg-slate-800/80 border border-slate-700 text-slate-100 text-xs focus:outline-none focus:border-cyan-500"
+                className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs focus:outline-none focus:border-cyan-500 focus:bg-white"
               />
             </div>
           </div>
 
           {/* Notes */}
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5">Additional Notes (Optional)</label>
+            <label className="block text-xs font-bold text-slate-700 mb-1.5">Additional Notes (Optional)</label>
             <textarea
               rows={2}
               placeholder="e.g. Special AV equipment requirements, guest count, projector setup"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full px-3.5 py-2 rounded-xl bg-slate-800/80 border border-slate-700 text-slate-100 text-sm focus:outline-none focus:border-cyan-500 placeholder-slate-500"
+              className="w-full px-3.5 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-sm focus:outline-none focus:border-cyan-500 focus:bg-white placeholder-slate-400"
             />
           </div>
 
           {/* Action buttons */}
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
+          <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
             <button
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="px-4 py-2 rounded-xl text-slate-400 hover:text-white text-xs font-medium hover:bg-slate-800 transition-colors"
+              className="px-4 py-2 rounded-xl text-slate-600 hover:text-slate-900 text-xs font-semibold hover:bg-slate-100 transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white text-xs font-semibold shadow-lg shadow-cyan-500/20 active:scale-95 disabled:opacity-50 transition-all"
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-bold shadow-sm active:scale-95 disabled:opacity-50 transition-all"
             >
               {loading ? (
                 <>

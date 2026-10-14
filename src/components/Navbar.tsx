@@ -76,19 +76,19 @@ export default function Navbar({ onOpenBookingModal }: NavbarProps) {
   ];
 
   return (
-    <header className="sticky top-0 z-40 w-full glass-panel border-b border-slate-800/80">
+    <header className="sticky top-0 z-40 w-full bg-white/90 backdrop-blur-md border-b border-slate-200/90 shadow-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
         {/* Brand */}
         <div className="flex items-center gap-6">
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 via-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-cyan-500/20 group-hover:scale-105 transition-transform">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-600 via-indigo-600 to-purple-600 flex items-center justify-center shadow-md shadow-cyan-600/20 group-hover:scale-105 transition-transform">
               <Sparkles className="w-5 h-5 text-white" />
             </div>
             <div>
-              <span className="font-bold text-lg tracking-tight text-white flex items-center gap-1.5">
-                PrimeWave <span className="text-cyan-400 font-mono text-xs uppercase px-1.5 py-0.5 rounded bg-cyan-950/60 border border-cyan-800/50">Core</span>
+              <span className="font-bold text-base sm:text-lg tracking-tight text-slate-900 flex items-center gap-1.5 leading-none">
+                PrimeWave <span className="text-cyan-700 font-mono text-[10px] uppercase px-1.5 py-0.5 rounded bg-cyan-50 border border-cyan-200">Core</span>
               </span>
-              <p className="text-[11px] text-slate-400 font-medium">Resource Reservation System</p>
+              <p className="text-[11px] text-slate-500 font-medium leading-none mt-1">Resource Reservation System</p>
             </div>
           </Link>
 
@@ -101,13 +101,13 @@ export default function Navbar({ onOpenBookingModal }: NavbarProps) {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                     isActive
-                      ? "bg-cyan-500/10 text-cyan-400 border border-cyan-500/30"
-                      : "text-slate-300 hover:text-white hover:bg-slate-800/60"
+                      ? "bg-cyan-50 text-cyan-800 border border-cyan-200/80 shadow-xs"
+                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
                   }`}
                 >
-                  <Icon className="w-4 h-4" />
+                  <Icon className="w-3.5 h-3.5" />
                   {item.label}
                 </Link>
               );
@@ -120,9 +120,9 @@ export default function Navbar({ onOpenBookingModal }: NavbarProps) {
           {onOpenBookingModal && (
             <button
               onClick={onOpenBookingModal}
-              className="hidden sm:flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white text-xs font-semibold shadow-md shadow-cyan-500/20 transition-all active:scale-95"
+              className="hidden sm:flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-semibold shadow-sm transition-all active:scale-95"
             >
-              <PlusCircle className="w-4 h-4" />
+              <PlusCircle className="w-3.5 h-3.5" />
               New Booking
             </button>
           )}
@@ -130,24 +130,24 @@ export default function Navbar({ onOpenBookingModal }: NavbarProps) {
           {currentUser ? (
             <div className="flex items-center gap-3">
               {/* Demo Switcher Quick Pill */}
-              <div className="hidden lg:flex items-center gap-1.5 bg-slate-900/80 border border-slate-800 p-1 rounded-lg text-xs">
-                <span className="text-slate-400 text-[11px] px-1.5">Switch Demo:</span>
+              <div className="hidden lg:flex items-center gap-1 bg-slate-100 border border-slate-200 p-1 rounded-lg text-xs">
+                <span className="text-slate-500 text-[11px] px-1.5 font-medium">Switch Demo:</span>
                 <button
                   onClick={() => quickSwitch("admin@primewave.com")}
-                  className={`px-2 py-0.5 rounded text-[11px] font-medium transition-colors ${
+                  className={`px-2 py-0.5 rounded text-[11px] font-semibold transition-colors ${
                     currentUser.role === "ADMIN"
-                      ? "bg-cyan-500 text-slate-950 font-bold"
-                      : "text-slate-300 hover:text-white"
+                      ? "bg-white text-slate-900 shadow-xs border border-slate-200"
+                      : "text-slate-600 hover:text-slate-900"
                   }`}
                 >
                   Admin
                 </button>
                 <button
                   onClick={() => quickSwitch("user@primewave.com")}
-                  className={`px-2 py-0.5 rounded text-[11px] font-medium transition-colors ${
+                  className={`px-2 py-0.5 rounded text-[11px] font-semibold transition-colors ${
                     currentUser.role === "USER"
-                      ? "bg-cyan-500 text-slate-950 font-bold"
-                      : "text-slate-300 hover:text-white"
+                      ? "bg-white text-slate-900 shadow-xs border border-slate-200"
+                      : "text-slate-600 hover:text-slate-900"
                   }`}
                 >
                   User
@@ -155,15 +155,15 @@ export default function Navbar({ onOpenBookingModal }: NavbarProps) {
               </div>
 
               {/* User badge */}
-              <div className="flex items-center gap-2 px-2.5 py-1 rounded-lg bg-slate-900/90 border border-slate-800">
-                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
-                  currentUser.role === "ADMIN" ? "bg-amber-500/20 text-amber-400 border border-amber-500/30" : "bg-cyan-500/20 text-cyan-400 border border-cyan-500/30"
+              <div className="flex items-center gap-2 px-2.5 py-1 rounded-lg bg-white border border-slate-200 shadow-xs">
+                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                  currentUser.role === "ADMIN" ? "bg-amber-100 text-amber-800" : "bg-cyan-100 text-cyan-800"
                 }`}>
-                  {currentUser.role === "ADMIN" ? <ShieldCheck className="w-4 h-4" /> : <User className="w-4 h-4" />}
+                  {currentUser.role === "ADMIN" ? <ShieldCheck className="w-3.5 h-3.5" /> : <User className="w-3.5 h-3.5" />}
                 </div>
                 <div className="hidden sm:block text-left">
-                  <div className="text-xs font-semibold text-slate-200 leading-none">{currentUser.name}</div>
-                  <div className="text-[10px] text-slate-400 font-mono leading-none mt-0.5">{currentUser.role}</div>
+                  <div className="text-xs font-bold text-slate-800 leading-none">{currentUser.name}</div>
+                  <div className="text-[10px] text-slate-500 font-mono leading-none mt-0.5">{currentUser.role}</div>
                 </div>
               </div>
 
@@ -171,7 +171,7 @@ export default function Navbar({ onOpenBookingModal }: NavbarProps) {
               <button
                 onClick={handleLogout}
                 title="Log out"
-                className="p-2 text-slate-400 hover:text-red-400 rounded-lg hover:bg-red-500/10 transition-colors"
+                className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition-colors"
               >
                 <LogOut className="w-4 h-4" />
               </button>
@@ -179,7 +179,7 @@ export default function Navbar({ onOpenBookingModal }: NavbarProps) {
           ) : !loading ? (
             <Link
               href="/login"
-              className="px-4 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold shadow-md transition-colors"
+              className="px-4 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-semibold shadow-xs transition-colors"
             >
               Log In
             </Link>
