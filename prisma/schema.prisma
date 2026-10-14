@@ -1,0 +1,67 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+enum ReservationStatus {
+  CONFIRMED
+  CANCELLED
+}
+
+model User {
+  id           String        @id @default(uuid()) @db.Uuid
+  name         String
+  email        String        @unique
+  passwordHash String
+  role         Role          @default(USER)
+  createdAt    DateTime      @default(now()) @db.Timestamptz
+  reservations Reservation[]
+}
+
+model ResourceCategory {
+  id        String     @id @default(uuid()) @db.Uuid
+  name      String     @unique
+  resources Resource[]
+}
+
+model Resource {
+  id           String           @id @default(uuid()) @db.Uuid
+  name         String
+  categoryId   String           @db.Uuid
+  category     ResourceCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  location     String
+  capacity     Int?
+  description  String?
+  isActive     Boolean          @default(true)
+  createdAt    DateTime         @default(now()) @db.Timestamptz
+  updatedAt    DateTime         @updatedAt @db.Timestamptz
+  reservations Reservation[]
+}
+
+model Reservation {
+  id          String            @id @default(uuid()) @db.Uuid
+  resourceId  String            @db.Uuid
+  resource    Resource          @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+  userId      String            @db.Uuid
+  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String
+  notes       String?
+  startTime   DateTime          @db.Timestamptz
+  endTime     DateTime          @db.Timestamptz
+  status      ReservationStatus @default(CONFIRMED)
+  createdAt   DateTime          @default(now()) @db.Timestamptz
+  updatedAt   DateTime          @updatedAt @db.Timestamptz
+  cancelledAt DateTime?         @db.Timestamptz
+
+  @@index([resourceId, startTime])
+  @@index([userId, startTime])
+}
